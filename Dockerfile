@@ -20,8 +20,9 @@ RUN \
   apt-get update  && \
   \
   \
-  echo "===> install Cassandra"  && \
+  echo "===> install Cassandra and related tools"  && \
   apt-get install -y --force-yes procps  && \
+  apt-get install -y --force-yes libjna-java  && \
   apt-get install -y --force-yes cassandra  cassandra-tools && \
   \
   \
@@ -29,17 +30,14 @@ RUN \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN rm -f /etc/security/limits.d/cassandra.conf
-
 ENV CASSANDRA_CONFIG /etc/cassandra
 
 ENV CASSANDRA_DATA /cassandra
 
 COPY ./docker-entrypoint.sh /
+COPY ./backup-cassandra.sh /usr/bin/
 
 VOLUME ["/cassandra", "/var/lib/cassandra", "/etc/cassandra"]
-
-COPY ./docker-entrypoint.sh /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
