@@ -8,6 +8,8 @@ FROM huahaiy/oracle-java
 
 MAINTAINER Huahai Yang <hyang@juji-inc.com>
 
+RUN echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d
+
 RUN \
   echo "===> add apache repository..."  && \ 
   echo "deb http://www.apache.org/dist/cassandra/debian 21x main" | tee \ 
@@ -20,10 +22,16 @@ RUN \
   apt-get update  && \
   \
   \
-  echo "===> install Cassandra and related tools"  && \
+  echo "===> install Cassandra"  && \
   apt-get install -y --force-yes procps  && \
-  apt-get install -y --force-yes libjna-java  && \
-  apt-get install -y --force-yes cassandra  cassandra-tools && \
+  apt-get install -y --force-yes cassandra  cassandra-tools 
+
+COPY ./tablesnap_0.6.2-1_amd64.deb /
+
+RUN \ 
+  echo "===> install tablesnap"  && \
+  apt-get install -y python-pyinotify python-boto python-dateutil && \
+  dpkg -i tablesnap_0.6.2-1_amd64.deb && \
   \
   \
   echo "===> clean up..."  && \
@@ -35,9 +43,8 @@ ENV CASSANDRA_CONFIG /etc/cassandra
 ENV CASSANDRA_DATA /cassandra
 
 COPY ./docker-entrypoint.sh /
-COPY ./backup-cassandra.sh /usr/bin/
 
-VOLUME ["/cassandra", "/var/lib/cassandra", "/etc/cassandra"]
+VOLUME ["/cassandra", "/dev/log", "/var/lib/cassandra", "/etc/cassandra"]
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
