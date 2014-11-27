@@ -1,5 +1,6 @@
 #
-# The latest Cassandra from Apache 
+# Run the latest Cassandra from Apache, also setup snapshot and 
+# incremental backup to S3
 #
 # Version     0.1
 #
@@ -29,14 +30,16 @@ RUN \
 COPY ./tablesnap_0.6.2-1_amd64.deb /
 
 RUN \ 
-  echo "===> install tablesnap"  && \
-  apt-get install -y python-pyinotify python-boto python-dateutil && \
+  echo "===> install supervisor and tablesnap"  && \
+  apt-get install -y supervisor python-pyinotify python-boto python-dateutil && \
   dpkg -i tablesnap_0.6.2-1_amd64.deb && \
+  mkdir -p /var/log/supervisor && \
   \
   \
   echo "===> clean up..."  && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 ENV CASSANDRA_CONFIG /etc/cassandra
 
@@ -50,4 +53,4 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 
 EXPOSE 22 7000 7001 7199 8888 9042 9160 61620 61621
 
-CMD ["cassandra", "-f"]
+CMD ["supervisord"]
