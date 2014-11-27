@@ -20,8 +20,7 @@ if [ "$1" = 'supervisord' ]; then
 
   sed -i "s/.*JVM_OPTS=\"\$JVM_OPTS -Djava.rmi.server.hostname=.*\"/JVM_OPTS=\"\$JVM_OPTS -Djava.rmi.server.hostname=$IP\"/" $CASSANDRA_CONFIG/cassandra-env.sh 
 
-  if [ -n "$S3_BUCKET" ]; then
-    cat <<EOF > /etc/supervisor/conf.d/supervisord.conf
+  cat <<EOF > /etc/supervisor/conf.d/supervisord.conf
 [supervisord]
 nodaemon=true
 childlogdir=/var/log/supervisor
@@ -31,6 +30,10 @@ loglevel=debug
 command=cassandra -f
 redirect_stderr=true
 
+EOF
+
+  if [ -n "$S3_BUCKET" ]; then
+    cat <<EOF >> /etc/supervisor/conf.d/supervisord.conf
 [program:backup]
 command=tablesnap -k $AWS_ACCESS_KEY -s $AWS_SECRET_KEY -r -a -B -p $CLUSTER_NAME/ -n $NODE_NAME --keyname-separator / -i $CASSANDRA_DATA/data/((?!system).)*/.* --listen-events IN_MOVED_TO --listen-events IN_CLOSE_WRITE $S3_BUCKET $CASSANDRA_DATA/data 
 redirect_stderr=true
