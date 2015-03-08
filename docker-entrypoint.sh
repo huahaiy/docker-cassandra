@@ -4,6 +4,10 @@ set -e
 if [ "$1" = 'supervisord' ]; then
   mkdir -p "$CASSANDRA_DATA"/data
   chown -R cassandra "$CASSANDRA_DATA"
+  mkdir -p "$CASSANDRA_COMMITLOG"
+  chown -R cassandra "$CASSANDRA_COMMITLOG"
+  mkdir -p "$CASSANDRA_CACHES"
+  chown -R cassandra "$CASSANDRA_CACHES"
 
   CLUSTER_NAME=${CLUSTER_NAME:-"TestCluster"}
   NODE_NAME=${NODE_NAME:-"cass1"}
@@ -11,6 +15,9 @@ if [ "$1" = 'supervisord' ]; then
   SEEDS=${SEEDS:-$IP}
 
   sed -i "s,/var/lib/cassandra/data,/cassandra/data," "$CASSANDRA_CONFIG"/cassandra.yaml
+  sed -i "s,/var/lib/cassandra/commitlog,/commitlog," "$CASSANDRA_CONFIG"/cassandra.yaml
+  sed -i "s,/var/lib/cassandra/saved_caches,/caches," "$CASSANDRA_CONFIG"/cassandra.yaml
+
   sed -i "s/'Test Cluster'/'$CLUSTER_NAME'/" "$CASSANDRA_CONFIG"/cassandra.yaml
   sed -i "s/^listen_address.*/listen_address: $IP/" "$CASSANDRA_CONFIG"/cassandra.yaml
   sed -i "s/^rpc_address.*/rpc_address: 0.0.0.0/" "$CASSANDRA_CONFIG"/cassandra.yaml

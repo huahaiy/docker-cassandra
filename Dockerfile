@@ -2,7 +2,7 @@
 # Run the latest Cassandra from Apache, also setup snapshot and 
 # incremental backup to S3
 #
-# Version     0.1
+# Version     0.2
 #
 
 FROM huahaiy/oracle-java
@@ -45,9 +45,13 @@ ENV CASSANDRA_CONFIG /etc/cassandra
 
 ENV CASSANDRA_DATA /cassandra
 
+ENV CASSANDRA_COMMITLOG /commitlog
+
+ENV CASSANDRA_caches /caches
+
 COPY ./docker-entrypoint.sh /
 
-VOLUME ["/cassandra", "/dev/log", "/var/lib/cassandra", "/etc/cassandra"]
+VOLUME ["/cassandra", "/commitlog", "/caches", "/dev/log", "/etc/cassandra"]
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
