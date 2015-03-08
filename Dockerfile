@@ -47,7 +47,7 @@ ENV CASSANDRA_DATA /cassandra
 
 ENV CASSANDRA_COMMITLOG /commitlog
 
-ENV CASSANDRA_caches /caches
+ENV CASSANDRA_CACHES /caches
 
 COPY ./docker-entrypoint.sh /
 
