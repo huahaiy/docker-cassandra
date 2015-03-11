@@ -6,10 +6,9 @@ This image runs an Apache Cassandra 2.1 node in a docker container. The data dir
 One can set these environment variables to customize the cluster: 
 
 * `CLUSTER_NAME` Default is "TestCluster" if not set.
-* `NODE_NAME` Default is "cass1" if unspecified.
-* `BROADCAST_ADDRESS` IP address of the host.
-* `LISTEN_ADDRESS` If unspecified, will use docker private IP.
-* `SEEDS` A comma-separated list of IP addresses. Default is the docker priviate IP.
+* `NODE_NAME` Default is "cass1" if unspecified, used as part of backup path name.
+* `SEEDS` A comma-separated list of IP addresses. 
 
-The container also continously backups the data to S3 using tablesnap, if these environment variables are set: `AWS_SECRET_KEY`, `AWS_ACCESS_KEY` and `S3_BUCKET`.
+If the following environment variables are set: `AWS_SECRET_KEY`, `AWS_ACCESS_KEY` and `S3_BUCKET`, the container also continuously backups the data to S3 using tablesnap. tablesnap and cassandra are both managed by supervisord.
 
+This image supports multi-node cluster, where one needs to run each container with `--net=host` option on a separate host. 
