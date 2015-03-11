@@ -12,8 +12,7 @@ if [ "$1" = 'supervisord' ]; then
   CLUSTER_NAME=${CLUSTER_NAME:-"TestCluster"}
   NODE_NAME=${NODE_NAME:-"cass1"}
   LISTEN_ADDRESS=${LISTEN_ADDRESS:-`hostname --ip-address`}
-  BROADCAST_RPC_ADDRESS=${BROADCAST_ADDRESS}
-  SEEDS=${SEEDS:-$LISTEN_ADDRESS}
+  SEEDS=${SEEDS:-"127.0.0.1"}
 
   sed -i "s,/var/lib/cassandra/data,/cassandra/data," "$CASSANDRA_CONFIG"/cassandra.yaml
   sed -i "s,/var/lib/cassandra/commitlog,/commitlog," "$CASSANDRA_CONFIG"/cassandra.yaml
@@ -21,10 +20,13 @@ if [ "$1" = 'supervisord' ]; then
 
   sed -i "s/'Test Cluster'/'$CLUSTER_NAME'/" "$CASSANDRA_CONFIG"/cassandra.yaml
   sed -i "s/^listen_address.*/listen_address: $LISTEN_ADDRESS/" "$CASSANDRA_CONFIG"/cassandra.yaml
-  sed -i "s/^rpc_address.*/rpc_address: 0.0.0.0/" "$CASSANDRA_CONFIG"/cassandra.yaml
-  sed -i "s/.*broadcast_address.*/broadcast_address: $BROADCAST_ADDRESS/" "$CASSANDRA_CONFIG"/cassandra.yaml
-  sed -i "s/.*broadcast_rpc_address.*/broadcast_rpc_address: $BROADCAST_RPC_ADDRESS/" "$CASSANDRA_CONFIG"/cassandra.yaml
   sed -i "s/- seeds: \".*\"/- seeds: \"$SEEDS\"/" "$CASSANDRA_CONFIG"/cassandra.yaml
+
+  if [ -n "$BROADCAST_ADDRESS" ]; then
+    sed -i "s/.*broadcast_address.*/broadcast_address: $BROADCAST_ADDRESS/" "$CASSANDRA_CONFIG"/cassandra.yaml
+    sed -i "s/^rpc_address.*/rpc_address: 0.0.0.0/" "$CASSANDRA_CONFIG"/cassandra.yaml
+    sed -i "s/.*broadcast_rpc_address.*/broadcast_rpc_address: $BROADCAST_ADDRESS/" "$CASSANDRA_CONFIG"/cassandra.yaml
+  fi
 
   sed -i "s/.*JVM_OPTS=\"\$JVM_OPTS -Djava.rmi.server.hostname=.*\"/JVM_OPTS=\"\$JVM_OPTS -Djava.rmi.server.hostname=$IP\"/" $CASSANDRA_CONFIG/cassandra-env.sh 
 
