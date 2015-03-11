@@ -2,7 +2,7 @@
 # Run the latest Cassandra from Apache, also setup snapshot and 
 # incremental backup to S3
 #
-# Version     0.2
+# Version     0.3
 #
 
 FROM huahaiy/oracle-java
